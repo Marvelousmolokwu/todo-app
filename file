@@ -1,0 +1,72 @@
+/ EDIT OPTIONS
+let editElement;
+let editFlag = false;
+let editID = "";
+
+// EVENT LISTENING
+//submit todo
+form.addEventListener("submit", addItem);
+//clear all items
+clearBtn.addEventListener("click", clearItems);
+// FUNCTIONS
+function addItem(e) {
+  e.preventDefault();
+
+  const value = todoInput.value;
+  const id = new Date().getTime.toString();
+  //   if there is a value and editFlag is false
+  if (value && !editFlag) {
+    //add id
+    const item = document.createElement("div");
+    const attr = document.createAttribute("data-id");
+    attr.value = id;
+    item.setAttributeNode(attr);
+    item.classList.add("todo-item");
+    item.innerHTML = ``;
+    //append child
+    list.appendChild(item);
+    displayAlert("added a new todo");
+    container.classList.remove("hidden");
+    //add to local storage
+    addtoLocalStorage(id, value);
+    // set back to default
+    setBacktodefault();
+    console.log(list);
+  } else if (value && editFlag) {
+    displayAlert("editing");
+  } else {
+    displayAlert("enter a value");
+  }
+}
+function displayAlert(text) {
+  alertText.textContent = text;
+  setTimeout(() => {
+    alertText.textContent = "";
+  }, 1000);
+}
+// **************************************
+function clearItems() {
+  const itemInList = document.querySelectorAll(".todo-item");
+  if (itemInList.length > 0) {
+    itemInList.forEach((i) => {
+      list.removeChild(i);
+    });
+  }
+  // **************************
+  container.classList.add("hidden");
+  displayAlert("item removed!");
+  localStorage.removeItem('list')
+  setBacktodefault();
+}
+// set back to default
+function setBacktodefault() {
+  todoInput.value = "";
+  editFlag = false;
+  editID = "";
+}
+
+// LOCAL STORAGE
+function addtoLocalStorage(id, value) {
+  console.log("added to local storage");
+}
+// SETUP ITEMS
