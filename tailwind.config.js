@@ -1,13 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./index.html"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
         veryLightGray: "hsl(0, 0%, 98%)",
         veryLightGrayish_Blue: "hsl(236, 33%, 92%)",
         light_Grayish_Blue: "hsl(233, 11%, 84%)",
-        dark_Grayish_Blue: "hsl(236, 9%, 61%)",
+        darkGrayishBlue: "hsl(236, 9%, 61%)",
         very_Dark_Grayish_Blue: "hsl(235, 19%, 35%)",
         very_Dark_Blue: "hsl(235, 21%, 11%)",
         very_Dark_Desaturated_Blue: "hsl(235, 24%, 19%)",

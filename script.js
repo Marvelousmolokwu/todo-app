@@ -1,4 +1,3 @@
-// SELECT ITEMS
 const alertText = document.querySelector(".alert");
 const form = document.querySelector(".todo-input");
 const todoInput = document.querySelector("#input");
@@ -6,15 +5,57 @@ const container = document.querySelector(".todo-container");
 const list = document.querySelector(".todo-list");
 
 const editBtn = document.querySelector(".check");
-
-const sunBtn = document.querySelector(".sun");
-const moonBtn = document.querySelector(".moon");
+const userTheme = localStorage.getItem("theme");
+const sunBtn = document.getElementById("sun");
+const moonBtn = document.getElementById("moon");
 const clearBtn = document.querySelector(".clearBtn");
 const remaining = document.querySelector(".remaining");
 const all = document.querySelector(".all");
 const completed = document.querySelector(".completed");
 const completedArray = [];
 const activeArray = [];
+
+if (
+  localStorage.theme === "dark" ||
+  (!("theme" in localStorage) &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches)
+) {
+  document.documentElement.classList.add("dark");
+} else {
+  document.documentElement.classList.remove("dark");
+}
+const iconToggle = () => {
+  moonBtn.classList.toggle("hidden");
+  sunBtn.classList.toggle("hidden");
+};
+
+const themeCheck = () => {
+  if (userTheme === "dark") {
+    document.documentElement.classList.add("dark");
+    moonBtn.classList.add("hidden");
+    return;
+  }
+  sunBtn.classList.add("hidden");
+};
+const themeswtich = () => {
+  if (document.documentElement.classList.contains("dark")) {
+    document.documentElement.classList.remove("dark");
+    localStorage.theme = "light";
+    iconToggle();
+    return;
+  }
+  document.documentElement.classList.add("dark");
+  localStorage.theme = "dark";
+  iconToggle();
+};
+moonBtn.addEventListener("click", () => {
+  themeswtich();
+});
+sunBtn.addEventListener("click", () => {
+  themeswtich();
+});
+themeCheck();
+
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 if (localStorage.getItem("tasks")) {
   tasks.map((task) => {
@@ -33,6 +74,7 @@ form.addEventListener("submit", (e) => {
     name: inputValue,
     iscompleted: false,
   };
+
   tasks.push(task);
   localStorage.setItem("tasks", JSON.stringify(tasks));
 
@@ -51,17 +93,17 @@ list.addEventListener("click", (e) => {
   }
 });
 
-list.addEventListener("keydown", (e) => {
-  if (e.keyCode === 13) {
-    e.preventDefault(e.target.blur());
-  }
-});
+function toggleDone(e, task) {
+  if (!e.target.matches(".check")) return;
+  const el = e.target;
+  const index = el.item;
+  console.log(index);
+  tasks[index].task.iscompleted = !tasks[index].task.iscompleted;
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  countTask();
+}
 
-list.addEventListener("input", (e) => {
-  const taskid = e.target.closest("li").id;
-  updatetask(taskid, e.target);
-});
-
+list.addEventListener("click", toggleDone);
 function createTask(task) {
   const item = document.createElement("li");
   item.setAttribute("id", task.id);
@@ -69,17 +111,17 @@ function createTask(task) {
     item.classList.add("complete");
   }
   item.innerHTML = `<article
-            class="list-none bg-white dark:bg-very_Dark_Desaturated_Blue w-full rounded-t-lg font-[18px] h-[50px] mt-[5px] border-b-[1px] border-y-light_Grayish_Blue items-center text-dark_Grayish_Blue flex"
+            class="list-none bg-white dark:bg-very_Dark_Desaturated_Blue w-full rounded-t-lg font-[18px] h-[50px] mt-[5px] border-b-[1px] border-y-light_Grayish_Blue items-center text-dark_Grayish_Blue flex dark:border-y-dark_Grayish_Blue"
           >
             <span
              
-              name=${task.iscompleted ? "checked" : " "}
+              name=${task.iscompleted ? "checked" : ""}
               id=${task.id}
-              class=" check  border-2 w-6 h-6 rounded-full mx-5  text-white text-center justify-center onclick ="print()"
+              class=" check  border-2 w-6 h-6 rounded-full mx-5  text-center dark:border-dark_Grayish_Blue justify-center dark:text-dark_Grayish_Blue onclick ="print()"
             >
              
             </span>
-            <div class="dark:text-white todo-item">
+            <div class="text-dark_Grayish_Blue todo-item">
               <p class="title ${!task.iscompleted ? "contenteditable" : ""}">${
     task.name
   }</p>
@@ -111,42 +153,25 @@ function removetask(taskid) {
   document.getElementById(taskid).remove();
   countTask();
 }
-function updatetask(taskid, el) {
-  const task = tasks.find((task) => task.id === pasrseInt(taskid));
-  if (el.hasAttribute("contenteditable")) {
-    task.name = el.textContent;
-  } else {
-    const span = el.nextElementSibling;
-    const parent = el.closest("li");
 
-    task.iscompleted = !task.iscompleted;
-    if (task.iscompleted) {
-      span.removeAttribute("contenteditable");
-      parent.classList.add("complete");
-    } else {
-      span.setAttribute("contenteditable", "true");
-      parent.classList.remove("complete");
-    }
-  }
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  countTask();
-}
 function print() {
   console.log("me");
   Array.from(document.getElementsByClassName("check")).forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const targetElement = e.target;
-      if (targetElement.matches(".check")) {
+
+      if (targetElement.matches(".check") || btn.style.background === "none") {
         btn.setAttribute(
           "style",
           "background: linear-gradient(to bottom, hsl(192, 100%, 67%), hsl(280, 87%, 65%));",
           "color: hsl(234 39% 85% / var(--tw-text-opacity));"
         );
-        btn.innerHTML = ` <small><i class="fa fa-check" aria-hidden="true"></i></small>`;
+        btn.innerHTML = ` <small><i class=" text-white fa fa-check" aria-hidden="true"></i></small>`;
         btn.nextSibling.nextSibling.setAttribute(
           "style",
           "text-decoration: line-through; color gray"
         );
+        tasks.iscompleted === true;
         completedArray.push(btn.nextSibling.nextSibling.textContent);
         console.log(completedArray);
       } else {
@@ -155,8 +180,10 @@ function print() {
           "style",
           "text-decoration: none; color: hsl(235 19% 35% / var(--tw-text-opacity));"
         );
-        btn.innerHTML = `<i class="fa fa-thin fa-xmark"></i>`;
-        activeArray.push(btn.nextSibling.nextSibling.textContent);
+        btn.innerHTML = "";
+        tasks.iscompleted === false;
+        completedArray.pop(btn.nextSibling.nextSibling.textContent);
+        // activeArray.push(btn.nextSibling.nextSibling.textContent);
         console.log(activeArray);
       }
     });
